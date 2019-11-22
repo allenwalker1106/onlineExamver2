@@ -66,37 +66,37 @@ const userSchema = new mongoose.Schema({
     },
     courses:[
         {
-            type: Mongoose.Schema.ObjectId,
+            type: mongoose.Schema.ObjectId,
             ref: 'Courses',
         }
     ],
     tests:[
         {
-            type: Mongoose.Schema.ObjectId,
+            type: mongoose.Schema.ObjectId,
             ref: 'Tests',
         }
     ],
     questions:[
         {
-            type: Mongoose.Schema.ObjectId,
+            type: mongoose.Schema.ObjectId,
             ref: 'Question',
         }
     ],
     results:[
         {
-            type:Mongoose.Schema.ObjectId,
+            type:mongoose.Schema.ObjectId,
             ref:'Results'
         }
     ],
     links:[
         {
-            type: Mongoose.Schema.ObjectId,
+            type: mongoose.Schema.ObjectId,
             ref: 'Links',
         }
     ],
     files:[
         {
-            type: Mongoose.Schema.ObjectId,
+            type: mongoose.Schema.ObjectId,
             ref: 'Files',
         }
     ]

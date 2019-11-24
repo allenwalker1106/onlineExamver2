@@ -50,12 +50,13 @@ const userSchema = new mongoose.Schema({
     },
     profile_image_link:{
         type: String,
-        default: "/data/image/default_avata.png"
+        default: "data/image/default_avata.png"
     },
     address:{
         city:{
             type: String,
             lowercase: true,
+            default :""
         },
         country:{
             type: String,

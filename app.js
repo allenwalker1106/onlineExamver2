@@ -3,9 +3,14 @@ const uuid = require('uuid/v4')
 const session = require('express-session')
 const FileStore = require('session-file-store')(session);
 const bodyParser = require('body-parser');
-const UserDB =  require('./mongoDBQuery.js').UserDB
+const UserDB =  require('./mongoDBQuery.js').UserDB;
+const QuestionDB = require('./mongoDBQuery.js').QuestionDB;
+const DB = require('./mongoDBQuery.js').DB;
 const PORT = 3000
+const URI = "mongodb://localhost:27017/test"
 
+
+DB.connect(URI);
 const app =express()
 
 app.set('views',__dirname+"/public/views");
@@ -28,7 +33,7 @@ app.use(session({
 
 
 app.get('/',(req,res)=>{
-	if(req.isAuthenticated){
+	if(req.session.isAuthenticated){
 		res.redirect('home');
 	}
 	else
@@ -79,7 +84,7 @@ app.get('/login',(req,res)=>{
 })
 
 app.get('/signup',(req,res)=>{
-	if(req.isAuthenticated){
+	if(req.session.isAuthenticated){
 		res.redirect('/home')
 	}
 	else{
@@ -87,21 +92,69 @@ app.get('/signup',(req,res)=>{
 	}
 })
 
-app.post('/signup',(req,res)=>{
-	console.log(req.body)
-	res.redirect('/')
+app.post('/signup',async (req,res)=>{
+	//post check required
+	let user = req.body.user
+	console.log(user);
+	const username_exist = await UserDB.CheckUsername(user.username).exec() ===1;
+	if(username_exist){
+		console.log('user')
+		// render err msg 
+		res.redirect('/signup')
+		res.end()
+	}
+	const email_exist = await UserDB.checkEmail(user.email).exec() !=0;
+	console.log(email_exist)
+	if(email_exist){
+		console.log('email')
+		//consolr log err mess email exist 
+		res.redirect('signup')
+		res.end()
+		return;
+	}
+	UserDB.InsertUser(user);
+	res.redirect('/login')
+	res.end()
 })
 
 
 app.get('/home',(req,res)=>{
 	if(req.session.isAuthenticated){
-		res.send('LOGGEDIN');
+		// res.send('LOGGEDIN');
+		console.log(req.session.user)
+		res.render('home',{user:req.session.user})
 		res.end();
 	}
 	else
-		res.redirect('login')
+		res.redirect('/login')
 })
 
+app.get('/update',async (req,res)=>{
+	if(req.session.isAuthenticated&& req.session.user)
+	{
+		console.log(req.session.user)
+		req.session.user = await UserDB.getUserById(req.session.user._id).exec()
+		console.log(req.session.user)
+		// res.redirect('/home')
+		res.end();
+	}
+	else{
+		res.redirect('/login')
+	}
+})
+
+app.get('/questions',async (req,res)=>{
+	if(req.session.isAuthenticated&& req.session.user ){
+		const questions  = await QuestionDB.getQuestionByUserId(req.session.user.questions).exec();
+		res.render('questions',{user:req.session.user,questions:questions});
+		req.session.questions = questions
+		console.log(questions);
+		res.end()
+	}
+	else{
+		res.redirect('/login')
+	}
+})
 
 app.set('port',PORT)
 

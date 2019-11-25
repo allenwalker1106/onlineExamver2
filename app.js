@@ -7,14 +7,14 @@ const UserDB =  require('./mongoDBQuery.js').UserDB;
 const QuestionDB = require('./mongoDBQuery.js').QuestionDB;
 const DB = require('./mongoDBQuery.js').DB;
 const PORT = 3000
-// const URI = "mongodb://localhost:27017/test"
-const URI= 'mongodb+srv://coldblood101:Dragon1774@mastercluster-lhsxk.azure.mongodb.net/onlineexam?retryWrites=true&w=majority'
-// const URI = "mongodb://localhost:27017/test"
+const URI = 'mongodb://localhost:27017/test'
+// const URI= 'mongodb+srv://coldblood101:Dragon1774@mastercluster-lhsxk.azure.mongodb.net/onlineexam?retryWrites=true&w=majority'
+// const URI = 'mongodb://localhost:27017/test'
 
 DB.connect(URI);
 const app =express()
 
-app.set('views',__dirname+"/public/views");
+app.set('views',__dirname+'/public/views');
 app.use(express.static('public/'))
 app.set('view engine','ejs');
 
@@ -170,13 +170,13 @@ app.get('/create_question',(req,res)=>{
 	}
 })
 
-app.post('create_question',(req,res)=>{
-
+app.post('/create_question',(req,res)=>{
+	console.log(req.body)	
+	let question = req.body.question
+	if(question.type==='Mutiple Choices')
 })
 
 
-app.set('port',PORT)
-
-app.listen(PORT,()=>{
+app.listen(PORT,(err)=>{
 	console.log(`app.listen on port ${PORT}`)
 })

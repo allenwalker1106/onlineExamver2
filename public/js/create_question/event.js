@@ -1,10 +1,15 @@
 
 $(document).ready(function() {
-    var indx = 1;
-    $('#add').click(function(){
-        var query = $("<div class=\"form-group\"><label for=\"question_title\">Option "+indx+"               </label><input type='checkbox' name=\"question[result][" +indx+ "]\" value=\""+indx+"\"><label> Is result</label><textarea class=\"form-control\" name=\"question[options]\" id=\"question_title\" rows=\"3\"></textarea></div>");
-        $('#option_container').append(query)
-        indx +=1;
+    var question_index = 1;
+    $('#add_option  ').click(function(){
+        let query = "<div class='form-group'>"+
+                    "<label for='question_title' style='color: black; font-size: 15px; width: 100px;'> Option "+question_index+" </label>"+
+                    "<input type='checkbox' name='question[result]["+question_index+"]' value='"+question_index+"'>"+
+                    "<label class ='form-label'  style='color: black; font-size: 15px; margin: 0px 20px;'> Is result</label>"+
+                    "<textarea class='form-control' name='question[options]' id='question_title' rows='3'></textarea>"+
+                    "</div>";
+        $('#option_container').append(query);
+        question_index++;
     })
 })
     

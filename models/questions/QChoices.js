@@ -1,10 +1,10 @@
-const mongoose = required('mongoose');
+const mongoose = require ('mongoose');
 
 const questionSchema = new mongoose.Schema({
 	type:{
 		type:String,
 		required: true,
-		default:"choices"
+		default:'Mutiple Choices'
 	},
 	topic:{
 		type:String,
@@ -14,12 +14,6 @@ const questionSchema = new mongoose.Schema({
 	owner:{
 		type:mongoose.Schema.ObjectId,
 		ref:'Users'
-	},
-	max_choices:{
-		type:Number, 
-		min:1,
-		default:1,
-		required: true
 	},
 	body:{
 		type:String,
@@ -37,6 +31,16 @@ const questionSchema = new mongoose.Schema({
 		type:Array,
 		default:[],
 		required: true
+	},
+	create_date :{
+		type: Date,
+		required: true,
+		default : Date.now
+	},
+	modified_date:{
+		type: Date,
+		required: true,
+		default: Date.now
 	}
 })
 

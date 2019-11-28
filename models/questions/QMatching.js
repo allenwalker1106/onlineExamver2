@@ -47,7 +47,17 @@ const questionSchema = new mongoose.Schema({
 				lowercase: true
 			}
 		}
-	]
+	],
+	create_date :{
+		type: Date,
+		required: true,
+		default : Date.now
+	},
+	modified_date:{
+		type: Date,
+		required: true,
+		default: Date.now
+	}
 })
 
 

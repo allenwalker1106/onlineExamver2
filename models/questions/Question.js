@@ -37,6 +37,16 @@ const questionSchema = new mongoose.Schema({
 		type:Array,
 		default:[],
 		required: true
+	},
+	create_date :{
+		type: Date,
+		required: true,
+		default : Date.now
+	},
+	modified_date:{
+		type: Date,
+		required: true,
+		default: Date.now
 	}
 })
 

@@ -15,7 +15,15 @@ const testSchema =  new mongoose.Schema({
 		type: mongoose.Schema.ObjectId,
 		ref:'Questions'
 	}],
+	topic:{
+		type: String,
+		required: true
+	},
 	create_date:{
+		type:Date,
+		default: Date.now
+	},
+	last_modified:{
 		type:Date,
 		default: Date.now
 	},

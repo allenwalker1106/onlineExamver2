@@ -144,11 +144,17 @@
                             <div class='card-body'>
                                 <div class='table-responsive'>
                                     <div class='table table-hover' style='padding: 10px;'>
+                                        <form action='/add_question' method='POST'>
+                                        <button type="submit" class="btn btn-primary"> Confirm Test</button>
+                                        <input type="text" class="form-control" name="test[_id]" value="<%=test._id%>"  readonly="readonly">
+                                        
                                         <% for(var i=0;i<questions.length;i++){ %>
                                             <div class='row'>
                                                 <div class='card' style='width: 100%; padding: 20px; border: 1px; border-style: solid;'>
                                                     <div class='card-body'>
-                                                        <h5 class='card-title'>Question
+                                                         
+                                                        <h5 class='card-title'>
+                                                            <input type='checkbox' name='test[_ids]' value='<%=questions[i]._id%>'> Question
                                                             <%=i+1%>
                                                         </h5>
                                                         <h7 class='card-subtitle mb-1 text-muted'>
@@ -247,6 +253,7 @@
                                                 </div>
                                             </div>
                                             <% } %>
+                                            </form>
                                     </div>
                                 </div>
                             </div>

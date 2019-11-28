@@ -1,6 +1,8 @@
 const mongoose = require('mongoose')
 const User = require('./models/User.js')
 const Question = require('./models/questions/Question.js')
+const QChoices = require('./models/questions/QChoices.js')
+const Test     = require('./models/Test.js')
 // const URI= 'mongodb+srv://coldblood101:Dragon1774@mastercluster-lhsxk.azure.mongodb.net/onlineexam?retryWrites=true&w=majority'
 // const URI = "mongodb://localhost:27017/test"
 
@@ -56,22 +58,87 @@ function getQuestionByUserId(_ids){
 	let query = {_id:{$in:_ids}};
 	return Question.find(query);
 }
+function InsertQuestion(q,_id){
+	let question = {
+		type: q.type,
+		topic: q.topic,
+		owner: _id,
+		body: q.body,
+		options: q.options,
+		result: q.result
+	}
+	var question_ob = new QChoices(question)
+	question_ob.save((err,res)=>{
+		if(err)
+			console.log('add unsuccessful')	
+		console.log('add successfull')
+	})
+	return question_ob._id
+
+}
+
+function  updateUserById(_id,_qid){
+	User.updateOne({_id: _id},{$push:{questions:_qid}},(err,res)=>{
+		console.log("Update successful");
+	});
+}
 
 
+
+//// Test databasses
+
+function getTestByUserId(_ids){
+	let query = {_id:{$in:_ids}};
+	return Test.find(query);
+}
+
+function createTest(test,owner){
+	let t= {
+		name: test.name,
+		description:test.description,
+		topic:test.topic,
+		owner:owner
+	}
+	var test = new Test(t);
+	test.save((err,res)=>{
+		if(err) throw err;
+		User.updateOne({_id: owner},{$push:{tests:test._id}},(err,res)=>{
+			console.log("add test susscess");
+		});
+	})
+
+	return test;
+
+}
+
+
+function addQuestion(ids,id){
+	Test.updateOne({_id:id},{$push:{questions:ids}});
+}
+//////Export model and function 
 
 exports.DB={
 	connect: connect
 }
-//export macro
+
 exports.UserDB={
 	getUserById:getUserById,
 	getUserByAccount:getUserByAccount,
 	InsertUser:InsertUser,
 	getUsersById: getUsersById,
 	CheckUsername:CheckUsername,
-	checkEmail:checkEmail
+	checkEmail:checkEmail,
+	updateUserById:updateUserById
 }
 
 exports.QuestionDB={
-	getQuestionByUserId:getQuestionByUserId
+	getQuestionByUserId:getQuestionByUserId,
+	InsertQuestion:InsertQuestion
+}
+
+
+exports.TestDB= {
+	getTestByUserId: getTestByUserId,
+	createTest:createTest,
+	addQuestion:addQuestion
 }

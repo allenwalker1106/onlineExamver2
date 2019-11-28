@@ -43,13 +43,13 @@
                             <p>Dashboard</p>
                         </a>
                     </li>
-                    <li class='active '>
+                    <li>
                         <a href='/questions'>
                             <i class='fa fa-list-ul'></i>
                             <p>Questions</p>
                         </a>
                     </li>
-                    <li>
+                    <li class='active '>
                         <a href='./tests'>
                             <i class='fa fa-copy'></i>
                             <p>Tests</p>
@@ -139,66 +139,23 @@
                     <div class='col-md-12'>
                         <div class='card'>
                             <div class='card-header'>
-                                <h4 class='card-title'>Question type</h4>
+                                <h4 class='card-title'> Test form <a href='/tests'><i class='fa fa-copy'></i></a> </h4>
                             </div>
-                            <div class='card-body'>
-                                <div class='container'>
-                                    <div class='row '>
-                                        <a class='qt_type col text-center btn btn-outline-danger active' id='qt_choices'>
-                                            <i class='fa fa-audio-description'></i>
-                                            <p>Mutiple Choice</p>
-                                        </a>
-                                        <a class='qt_type col text-center btn btn-outline-danger  ' id='qt_matching'>
-                                            <i class='fa fa-list-ol'></i>
-                                            <p>Matching</p>
-                                        </a>
-                                        <a class='qt_type col text-center btn btn-outline-danger  ' id='qt_true_false'>
-                                            <i class='fa fa-check-square'></i> <i class='fa fa-square'></i>
-                                            <p>True False</p>
-                                        </a>
-                                        <a class='qt_type col text-center btn btn-outline-danger  ' id='qt_text'>
-                                            <i class='fa fa-align-left'></i>
-                                            <p>Text</p>
-                                        </a>
-                                        <a class='qt_type col text-center btn btn-outline-danger  ' id='qt_code'>
-                                            <i class='fa fa-code'></i>
-                                            <p>Code</p>
-                                        </a>
-                                    </div>
+                            <div class="card-body">
+                                    <form action="/create_test" method="POST">
+                                        <label for="test_name" class="form-label">Test Name</label>
+                                        <input name="test[name]" type ="text" class="form-control" id="test_name" placeholder="Test name" required>
+                                        <label for="test_topic" class="form-label">Topic </label>
+                                        <input name="test[topic]" type ="text" class="form-control" id="test_topic" placeholder="Topic" required>
+                                        <label for="test_description" class="form-label">Description </label>
+                                        <textarea name="test[description]"  class="form-control" id="test_description" placeholder="Description" row="3"></textarea>
+                                        <button type="submit" class="btn btn-warning"><i class="fa fa-plus"></i> Addquestion now !</button>
+                                    </form>
                                 </div>
-                            </div>
                         </div>
+                        
                     </div>
-                </div>
-                <div class='row'>
-                    <div class='col-md-12'>
-                        <div class='card'>
-                            <div class='card-header'>
-                                <h4 class='card-title'> Question Form <a href='/questions'><i class='fa fa-list-ul'></i></a> <a href='/import_questions'><i class='fa fa-upload'></i></a></h4>
-                            </div>
-                            <div class='card-body '>
-                                <form method='POST' action='/create_question'>
-                                    <div class='form-group'>
-                                        <label class='form-label' for='question_type'>Question type</label>
-                                        <input type='text' class='form-control' id='question_type' value='Mutiple Choices' name='question[type]'  readonly="readonly">
-                                    </div>
-                                    <div class='form-group'>
-                                        <label class='form-label' for='question_title'>Question</label>
-                                        <textarea name='question[body]' class='form-control' id='question_title' rows='3'></textarea>
-                                    </div>
-                                    <div class='form-group'>
-                                        <label class='form-label' for='question_topic'>topic</label>
-                                        <input name='question[topic]' class='form-control' id='question_topic' type='text'>
-                                    </div>
-
-                                    <div class='form-group' id='option_container'>
-                                    </div>
-                                    <button type='submit' class='btn btn-primary'>Submit</button>
-                                    <a class='btn '  role='button' id='add_option' ><i class='fa fa-plus'></i>More Options</a>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
+                    
                     <a class='btn' style='position: fixed; right:5px; bottom: 5px;' href='#cardhead'><i class='fa fa-chevron-circle-up' style='font-size: 30px;'></i></a>
                 </div>
 

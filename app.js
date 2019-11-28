@@ -5,6 +5,7 @@ const FileStore = require('session-file-store')(session);
 const bodyParser = require('body-parser');
 const UserDB =  require('./mongoDBQuery.js').UserDB;
 const QuestionDB = require('./mongoDBQuery.js').QuestionDB;
+const TestDB  = require('./mongoDBQuery.js').TestDB;
 const DB = require('./mongoDBQuery.js').DB;
 const PORT = 3000
 const URI = 'mongodb://localhost:27017/test'
@@ -119,10 +120,12 @@ app.post('/signup',async (req,res)=>{
 })
 
 
-app.get('/home',(req,res)=>{
+app.get('/home',async (req,res)=>{
 	if(req.session.isAuthenticated){
 		// res.send('LOGGEDIN');
-		console.log(req.session.user)
+		let user =req.session.user;
+		const user_data =await UserDB.getUserByAccount(user.username,user.password).exec();
+		req.session.user = user_data;
 		res.render('home',{user:req.session.user})
 		res.end();
 	}
@@ -148,7 +151,6 @@ app.get('/questions',async (req,res)=>{
 	if(req.session.isAuthenticated&& req.session.user ){
 		const questions  = await QuestionDB.getQuestionByUserId(req.session.user.questions).exec();
 		res.render('questions',{user:req.session.user,questions:questions});
-		req.session.questions = questions
 		console.log(questions);
 		res.end()
 	}
@@ -170,12 +172,82 @@ app.get('/create_question',(req,res)=>{
 	}
 })
 
-app.post('/create_question',(req,res)=>{
-	console.log(req.body)	
-	let question = req.body.question
-	if(question.type==='Mutiple Choices')
+app.post('/create_question',async (req,res)=>{
+	if(req.session.isAuthenticated&& req.session.user){
+		console.log(req.body)	
+		let question = req.body.question
+		let _id = req.session.user._id;
+		console.log(question)
+		if(question.type==='Mutiple Choices'){
+			console.log('a')
+			let _qid= QuestionDB.InsertQuestion(question,_id);	
+			//update uoser databases ;
+
+			req.session.user.questions.push(_qid);
+			UserDB.updateUserById(_id,_qid);
+			// console.log(res);
+			res.redirect('/create_question');
+		}
+	}else
+		res.redirect('/login')
+
 })
 
+app.get('/logout',(req,res)=>{
+	req.session.destroy();
+	res.redirect('/signup');
+})
+
+/// Test
+app.get('/tests',async (req,res)=>{
+	if(req.session.isAuthenticated&& req.session.user){
+		const tests  = await TestDB.getTestByUserId(req.session.user.tests).exec();
+		res.render('tests',{user:req.session.user,tests:tests});
+		res.end()
+	}else
+		res.redirect('/login');
+})
+
+
+app.get('/create_test',(req,res)=>{
+	if(req.session.isAuthenticated&& req.session.user){
+		let user={
+			name: req.session.user.name,
+			profile_image_link: req.session.user.profile_image_link
+		}
+		res.render('create_test',{user:user});
+	}else{
+		res.redirect('/login');
+	}
+})
+
+app.post('/create_test',async (req,res)=>{
+	if(req.session.isAuthenticated&& req.session.user){
+		let test=TestDB.createTest(req.body.test,req.session.user._id);
+		let user={
+			name: req.session.user.name,
+			profile_image_link: req.session.user.profile_image_link
+		}
+		const questions  = await QuestionDB.getQuestionByUserId(req.session.user.questions).exec();
+		res.render('add_question',{user:user,test:test,questions: questions});
+		res.end();
+	}else{
+		res.redirect('/login');
+	}
+})
+
+app.post('/add_question',(req,res)=>{
+
+	if(req.session.isAuthenticated&& req.session.user){
+		test = req.body.test;
+		console.log(test)
+		TestDB.addQuestion(test._ids,test._id);
+		res.redirect('/tests');
+		res.end();
+	}else{
+		res.redirect('/login');
+	}
+})
 
 app.listen(PORT,(err)=>{
 	console.log(`app.listen on port ${PORT}`)

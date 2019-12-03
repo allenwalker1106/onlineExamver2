@@ -25,9 +25,11 @@ const questionSchema = new mongoose.Schema({
 		type:String,
 		required: true,
 	},
-	imported:[{
-		type:mongoose.Schema.ObjectId,
-	}],
+	imported:{
+		type:Array,
+		default:[],
+		required: true
+	},
 	options:{
 		type:Array,
 		default:[],

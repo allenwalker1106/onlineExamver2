@@ -6,7 +6,7 @@ const testSchema =  new mongoose.Schema({
 		min: 6,
 		max: 255
 	},
-	desciption: {
+	description: {
 		type:String,
 		min: 6,
 		max : 1024

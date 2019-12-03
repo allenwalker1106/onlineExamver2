@@ -1,4 +1,4 @@
-const mongoose = required('mongoose');
+const mongoose = require('mongoose');
 
 const questionSchema = new mongoose.Schema({
 	type:{
@@ -19,35 +19,21 @@ const questionSchema = new mongoose.Schema({
 		type:String,
 		required: true,
 	},
-	imported:[{
-		type:mongoose.Schema.ObjectId,
-	}],
-	options:{
-		head:{
-			type:Array,
-			default:[],
-			required: true
-		},
-		tail:{
-			type:Array,
-			default:[],
-			required: true
-		}
+	imported:{
+		type:Array,
+		default:[],
+		required: true
 	},
-	result:[
-		{
-			head:{
-				type:String,
-				required:true,
-				lowercase: true
-			},
-			tail:{
-				type:String,
-				required:true,
-				lowercase: true
-			}
-		}
-	],
+	options:{
+		type:Array,
+		default:[],
+		required: true
+	},
+	result:{
+		type:Array,
+		default:[],
+		required: true
+	},
 	create_date :{
 		type: Date,
 		required: true,

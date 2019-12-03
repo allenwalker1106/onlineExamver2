@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/exam_display/styles.css">
+  </head>
+  <body>
+        <nav class="navbar navbar-default navbar-fixed-top" style="-webkit-box-shadow: -2px 18px 24px -28px rgba(0,0,0,0.75);
+		-moz-box-shadow: -2px 18px 24px -28px rgba(0,0,0,0.75);
+		box-shadow: -2px 18px 24px -28px rgba(0,0,0,0.75);background:rgba(255,255,255,0.9);">
+
+			  <div class="container-fluid">
+			    <header  role="banner">
+			    	<div class="logo-main">
+			    		<ul class="nav navbar-nav navbar-right" style="margin-top: 10px;margin-right: 20px;">
+			  				<li><button class="btn btn-default" disabled="" style="float: right;border: none;">Student Name</button></li>
+			      			<li><button class="btn btn-default" id="timer" disabled="" style="float: right;"></button></li>
+                            <script>
+// Set the date we're counting down to
+var countDownDate = (new Date(Date.now() + <%-link.time_limit%>*60000)).getTime();
+console.log(countDownDate);
+// Update the count down every 1 second
+var x = setInterval(function() {
+
+  // Get today's date and time
+  var now = new Date().getTime();
+    
+  // Find the distance between now and the count down date
+  var distance = countDownDate - now;
+    
+  // Time calculations for days, hours, minutes and seconds
+  var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+  var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+  var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+    
+  // Output the result in an element with id="demo"
+  document.getElementById("timer").innerHTML = days + "d " + hours + "h "
+  + minutes + "m " + seconds + "s ";
+    
+  // If the count down is over, write some text 
+  if (distance < 0) {
+    clearInterval(x);
+    document.getElementById("timer").innerHTML = "EXPIRED";
+    alert('Timeups');
+    document.forms["test_form"].submit();
+  }
+}, 1000);
+</script>
+                        </ul>
+			    	</div>
+				</header>
+			  </div>
+		</nav>
+    <form action="/submit_test" method="POST" id="test_form">
+    <div class="container-fluid " style="margin-top: 120px;margin-bottom: 100px;">
+        <!-- display question -->
+        <% for(i=0;i<questions.length;i++){%>
+		<div class="row" id="q<%-i+1%>">
+			<div class="col-md-9">
+					<div class="box1">
+						<div class="box2">
+							<div>
+								<button class="btn btn-default" >Quesion <%=i+1%>  : <%=questions[i].type%></button>
+							</div>
+							<div class="container-fluid">
+								<p class="background"><%=questions[i].body%></p>
+							</div>
+							<div>
+                                <%if (questions[i].type==='Mutiple Choices'){%>
+                                    <%for (j=0;j<questions[i].options.length;j++){%>
+                                    
+				                				        <div  style="margin:5px;">
+                                            <label> </label>
+                                            <label><input type="<%=questions[i].result.length>1 ? 'checkbox' : 'radio'%>"  name="result[<%=questions[i]._id%>]" value=" <%=questions[i].options[j]%>"><label id="o1"> <%=questions[i].options[j]%></label></label>
+                                        </div>
+                                    <%}%>
+                                <%}%>
+                                <% if (questions[i].type==='Matching'){%>
+                                    <%for (j=0;j<questions[i].options.length;j++){%>
+                                    
+								        <div > 
+                                            <label></label>
+                                            <input type="text" readonly="readonly" value="<%=questions[i].options[j]%>"> 
+                                            <select required name="result[<%=questions[i]._id%>]">
+                                                <%for (k=0;k<questions[i].result.length;k++){%> 
+                                                <option value="<%=questions[i].result[k]%>"><%=questions[i].result[k]%></option>
+                                                <%}%>
+                                            </select>
+                                        
+                                        </div>
+                                    <%}%>
+                                <%}%>
+                                <% if (questions[i].type==='True False'){%>
+                                    <label style="margin-left:250px;">True</label><label  style="margin-left:10px;">False</label>
+                                    <%for (j=0;j<questions[i].options.length;j++){%>
+                                        <div > 
+                                            <label></label>
+                                            <input id="content" type="text"   readonly="readonly" value="<%=questions[i].options[j]%>"> 
+                                            <input name="result[<%=questions[i]._id%>]" style="margin-left:50px;" type="checkbox"  value="<%=j+1%>" id="cb_true">
+                                            <input type="checkbox"   value="False">
+                                        </div>
+                                    <%}%>
+                                <%}%>
+                                <% if (questions[i].type==='Text'){%>
+
+                                        <div > 
+                                            <label></label>
+                                            <textarea name="result[<%=questions[i]._id%>]"  class="form-control" rows="3" placeholder="Your answear"></textarea> 
+
+                                        </div>
+                                <%}%>
+                                <% if (questions[i].type==='Code'){%>
+
+                                    <div > 
+                                        <label></label>
+                                        <textarea name="result[<%=questions[i]._id%>]"  style="color:whitesmoke; background-color: #333333;"class="form-control" rows="12" placeholder="Your Code"></textarea> 
+
+                                    </div>
+                            <%}%>
+							</div>
+						</div>
+					</div>
+                </div>
+                <%if (i===0){%>
+				<div class="col-md-3">
+					<div class="box1">
+						<div class="box2">
+							<div class="rox">
+								<div style="text-align: center;">
+									<h4>Questions</h4>
+									<hr>
+								</div>
+							</div>
+							<div class="row" >
+                                <%for(j=0;j<questions.length;j++){%>
+								<div class="col-md-3 col-xs-3">
+									<div>
+										<a href="#q<%-j+1%>"><button  class="btn btn-default"><%=(j+1>9?"":"0")%><%=j+1%></button></a>
+									</div>
+                                </div>
+                                <%}%>
+							</div>
+						
+							<div class="row" style="margin-top: 20%;">
+								<div class="" style="text-align: center;">
+									<button class="btn btn-primary" data-toggle="tooltip" title="Previous" ><</button>
+									<button class="btn btn-default" data-toggle="tooltip" title="1" disabled style="cursor: default;" >1</button>
+									<button class="btn btn-primary" data-toggle="tooltip" title="Next" >></button>
+								</div>						
+							</div>
+						</div>
+						<div class="row" style="margin-top: 15%;">
+								<div class="" style="text-align: center;">
+									<button class="btn btn-primary" type="button">Uncheck</button>
+									<button class="btn btn-primary" type="button">Bookmark</button>
+									<button class="btn btn-danger" type="button" data-toggle="modal" data-target="#teamviewmodal">Submit</button>
+								</div>						
+							</div>
+						
+					</div>
+				</div>
+                <%}%>
+			
+				
+			
+		</div>
+		<%}%>
+		
+  </div>
+</form>
+	  <!--modal-->
+		<div class="modal fade" id="teamviewmodal" role="dialog">
+	    <div class="modal-dialog">
+	    
+	      <!-- Modal content-->
+	      <div class="modal-content" >
+	        <div class="modal-header">
+	          <button type="button" class="close" data-dismiss="modal">&times;</button>
+	          <h4 class="modal-title textfont" style="text-align: center;"><strong style="font-size: 25px">Warning</strong></h4>
+	        </div>
+	        <div class="modal-body" style="text-align: center;">
+	          <h5>Do You Really Want to Submit Test?</h5>
+	        </div>
+	        <div class="modal-footer">
+            <button type="submit" class="btn btn-primary"  data-dismiss="modal" id="confirm_submit">Yes</button>
+            <script>
+              document.getElementById('confirm_submit').onclick=function(){console.log('test');document.getElementById("test_form").submit();}
+            </script>
+	          <button type="button" class="btn btn-primary" data-dismiss="modal">No</button>
+	        </div>
+	      </div>
+	      
+	    </div>
+	  </div>
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+  </body>
+</html>

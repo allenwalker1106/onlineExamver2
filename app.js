@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 const UserDB =  require('./mongoDBQuery.js').UserDB;
 const QuestionDB = require('./mongoDBQuery.js').QuestionDB;
 const TestDB  = require('./mongoDBQuery.js').TestDB;
+const LinkDB  = require('./mongoDBQuery.js').LinkDB;
 const DB = require('./mongoDBQuery.js').DB;
 const PORT = 3000
 const URI = 'mongodb://localhost:27017/test'
@@ -149,7 +150,12 @@ app.get('/update',async (req,res)=>{
 
 app.get('/questions',async (req,res)=>{
 	if(req.session.isAuthenticated&& req.session.user ){
+
+		let user =req.session.user;
+		const user_data =await UserDB.getUserByAccount(user.username,user.password).exec();
+		req.session.user = user_data;
 		const questions  = await QuestionDB.getQuestionByUserId(req.session.user.questions).exec();
+		
 		res.render('questions',{user:req.session.user,questions:questions});
 		console.log(questions);
 		res.end()
@@ -158,6 +164,7 @@ app.get('/questions',async (req,res)=>{
 		res.redirect('/login')
 	}
 })
+
 
 
 app.get('/create_question',(req,res)=>{
@@ -171,15 +178,62 @@ app.get('/create_question',(req,res)=>{
 		res.redirect('login')
 	}
 })
+app.get('/qmatching',(req,res)=>{
+	if(req.session.isAuthenticated){
+		let user={
+			name: req.session.user.name,
+			profile_image_link: req.session.user.profile_image_link
+		}
+		res.render('matching',{user:user});
+	}else{
+		res.redirect('login')
+	}
+})
+
+app.get('/qtruefalse',(req,res)=>{
+	if(req.session.isAuthenticated){
+		let user={
+			name: req.session.user.name,
+			profile_image_link: req.session.user.profile_image_link
+		}
+		res.render('truefalse',{user:user});
+	}else{
+		res.redirect('login')
+	}
+})
+
+app.get('/qtext',(req,res)=>{
+	if(req.session.isAuthenticated){
+		let user={
+			name: req.session.user.name,
+			profile_image_link: req.session.user.profile_image_link
+		}
+		res.render('text',{user:user});
+	}else{
+		res.redirect('login')
+	}
+})
+
+
+app.get('/qcode',(req,res)=>{
+	if(req.session.isAuthenticated){
+		let user={
+			name: req.session.user.name,
+			profile_image_link: req.session.user.profile_image_link
+		}
+		res.render('code',{user:user});
+	}else{
+		res.redirect('login')
+	}
+})
+
 
 app.post('/create_question',async (req,res)=>{
 	if(req.session.isAuthenticated&& req.session.user){
-		console.log(req.body)	
 		let question = req.body.question
 		let _id = req.session.user._id;
 		console.log(question)
 		if(question.type==='Mutiple Choices'){
-			console.log('a')
 			let _qid= QuestionDB.InsertQuestion(question,_id);	
 			//update uoser databases ;
 
@@ -187,10 +241,38 @@ app.post('/create_question',async (req,res)=>{
 			UserDB.updateUserById(_id,_qid);
 			// console.log(res);
 			res.redirect('/create_question');
+		}else if(question.type==="Matching"){
+			let _qid= QuestionDB.InsertQuestion(question,_id);	
+			//update uoser databases ;
+
+			req.session.user.questions.push(_qid);
+			UserDB.updateUserById(_id,_qid);
+			res.redirect('/qmatching');
+		}else if(question.type==="True False"){
+			let _qid= QuestionDB.InsertQuestion(question,_id);	
+			//update uoser databases ;
+
+			req.session.user.questions.push(_qid);
+			UserDB.updateUserById(_id,_qid);
+			res.redirect('/qtruefalse');
+		}else if(question.type==="Text"){
+			let _qid= QuestionDB.InsertQuestion(question,_id);	
+			//update uoser databases ;
+
+			req.session.user.questions.push(_qid);
+			UserDB.updateUserById(_id,_qid);
+			res.redirect('/qtext');
+		}else if(question.type==="Code"){
+			let _qid= QuestionDB.InsertQuestion(question,_id);	
+			//update uoser databases ;
+
+			req.session.user.questions.push(_qid);
+			UserDB.updateUserById(_id,_qid);
+			res.redirect('/qcode');
 		}
 	}else
 		res.redirect('/login')
-
+// 
 })
 
 app.get('/logout',(req,res)=>{
@@ -201,6 +283,10 @@ app.get('/logout',(req,res)=>{
 /// Test
 app.get('/tests',async (req,res)=>{
 	if(req.session.isAuthenticated&& req.session.user){
+
+		let user =req.session.user;
+		const user_data =await UserDB.getUserByAccount(user.username,user.password).exec();
+		req.session.user = user_data;
 		const tests  = await TestDB.getTestByUserId(req.session.user.tests).exec();
 		res.render('tests',{user:req.session.user,tests:tests});
 		res.end()
@@ -236,12 +322,15 @@ app.post('/create_test',async (req,res)=>{
 	}
 })
 
-app.post('/add_question',(req,res)=>{
+
+
+app.post('/add_question',async (req,res)=>{
 
 	if(req.session.isAuthenticated&& req.session.user){
 		test = req.body.test;
-		console.log(test)
+		const test_ob = await TestDB.getTestById(test._id).exec();
 		TestDB.addQuestion(test._ids,test._id);
+		QuestionDB.importUpdate(test_ob,test._ids);
 		res.redirect('/tests');
 		res.end();
 	}else{
@@ -249,6 +338,113 @@ app.post('/add_question',(req,res)=>{
 	}
 })
 
+app.get('/test_details',async (req,res)=>{
+	if(req.session.isAuthenticated&& req.session.user){
+		let test_id = req.query._id
+		const test = await TestDB.getQuestion(test_id).exec();
+		let user =req.session.user;
+		const questions  = await QuestionDB.getQuestionByIds(test.questions).exec();
+		
+		res.render('test_details',{user:req.session.user,questions:questions,test:test});
+		console.log(questions);
+		res.end()
+	}else{
+		res.redirect('/login');
+	}
+})
+
+
+
+app.get('/links',async (req,res)=>{
+	if(req.session.isAuthenticated&& req.session.user ){
+		let user =req.session.user;
+		const user_data =await UserDB.getUserById(user._id).exec();
+		req.session.user = user_data;
+		const links = await LinkDB.getLinkByUser(user._id).exec();
+		
+		res.render('links',{user:req.session.user,links:links});
+		console.log(links);
+		res.end()
+	}
+	else{
+		res.redirect('/login')
+	}
+}) 
+
+
+app.get('/link_config',async (req,res)=>{
+	if(req.session.isAuthenticated&& req.session.user ){
+		let _id = req.query._id;
+		
+		let user={
+			name: req.session.user.name,
+			profile_image_link: req.session.user.profile_image_link
+		}
+		res.render('link_config',{user:user,test:{_id:_id}},);
+		res.end()
+	}
+	else{
+		res.redirect('/login')
+	}
+})
+
+app.post('/create_link',(req,res)=>{
+	if(req.session.isAuthenticated&& req.session.user ){
+		let _id = req.query._id;
+		
+		let config = req.body.link
+		config.owner = req.session.user._id
+		LinkDB.insertLink(config,_id)
+		res.redirect('/links')
+		res.end()
+	}
+	else{
+		res.redirect('/login')
+	}
+})
+
+
+app.get('/exam_link', async(req,res)=>{
+	
+	let _id = req.query.quiz;
+	const link = await LinkDB.getLinkById(_id).exec();
+	const test = await TestDB.getTestById(link.test_id).exec();
+	const questions  = await QuestionDB.getQuestionByIds(test.questions).exec()
+	console.log(questions)
+	if(link.restrictions){
+		if(req.session.isAuthenticated&& req.session.user ){
+			console.log(link);
+			console.log(test);
+			res.render('exam_display');
+			res.end()
+		}
+		else{
+			res.redirect('/login')
+		}
+	}else{
+		console.log(link);
+		console.log(test);
+		res.render('exam_display',{link:link,questions:questions});
+		res.end()
+	}
+	
+})
+
+app.post('/submit_test',(req,res)=>{
+	console.log(req.body);
+	res.redirect('/result_display');
+	res.end();
+})
+app.get('/result_display',(req,res)=>{
+	res.send('Your result : 5/6')
+	res.end()
+})
+
+
+
+
 app.listen(PORT,(err)=>{
 	console.log(`app.listen on port ${PORT}`)
 })
+
+

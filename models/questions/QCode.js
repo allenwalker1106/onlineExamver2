@@ -1,4 +1,4 @@
-const mongoose = required('mongoose');
+const mongoose = require('mongoose');
 
 const questionSchema = new mongoose.Schema({
 	type:{
@@ -19,25 +19,21 @@ const questionSchema = new mongoose.Schema({
 		type:String,
 		required: true,
 	},
-	imported:[{
-		type:mongoose.Schema.ObjectId,
-	}],
-	options:{
+	imported:{
+		type:Array,
+		default:[],
+		required: true
 	},
-	result:[
-		{
-			input:{
-				type:String,
-				required:true,
-				lowercase: true
-			},
-			out:{
-				type:String,
-				required:true,
-				lowercase: true
-			}
-		}
-	],
+	options:{
+		type:Array,
+		default:[],
+		required: true
+	},
+	result:{
+		type:Array,
+		default:[],
+		required: true
+	},
 	create_date :{
 		type: Date,
 		required: true,
@@ -51,4 +47,4 @@ const questionSchema = new mongoose.Schema({
 })
 
 
-module.exports = mongoose.model('QCOde',questionSchema,'questions');
+module.exports = mongoose.model('QCode',questionSchema,'questions');

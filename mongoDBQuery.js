@@ -2,7 +2,11 @@ const mongoose = require('mongoose')
 const User = require('./models/User.js')
 const Question = require('./models/questions/Question.js')
 const QChoices = require('./models/questions/QChoices.js')
+const QMatching = require('./models/questions/QMatching.js')
+const QValidate = require('./models/questions/QValidate.js')
+const QCode = require('./models/questions/QCode.js')
 const Test     = require('./models/Test.js')
+const Link = require('./models/Links.js')
 // const URI= 'mongodb+srv://coldblood101:Dragon1774@mastercluster-lhsxk.azure.mongodb.net/onlineexam?retryWrites=true&w=majority'
 // const URI = "mongodb://localhost:27017/test"
 
@@ -56,8 +60,24 @@ function checkEmail(email){
 //question DB function
 function getQuestionByUserId(_ids){
 	let query = {_id:{$in:_ids}};
-	return Question.find(query);
+	return Question.find(query).sort({create_date:-1});
 }
+
+function getQuestionByIds(_ids){
+	return Question.find({_id:{$in:_ids}});
+}
+
+function importUpdate(test,q_ids){
+	let test_data={
+		_id:test._id,
+		name:test.name
+	}
+	Question.updateMany({_id:{$in:q_ids}},{$push:{imported:test_data}},(err,res)=>{
+		if(err) throw err;
+		console.log('imported success');
+	})
+}
+
 function InsertQuestion(q,_id){
 	let question = {
 		type: q.type,
@@ -67,14 +87,52 @@ function InsertQuestion(q,_id){
 		options: q.options,
 		result: q.result
 	}
-	var question_ob = new QChoices(question)
-	question_ob.save((err,res)=>{
-		if(err)
-			console.log('add unsuccessful')	
-		console.log('add successfull')
-	})
-	return question_ob._id
+	if(q.type=="Mutiple Choices"){
 
+		var question_ob = new QChoices(question)
+		question_ob.save((err,res)=>{
+			if(err)
+				console.log('add unsuccessful')	
+			console.log('add successfull')
+		})
+		return question_ob._id
+	}
+	else if(q.type==="Matching"){
+
+		var question_ob = new QMatching(question)
+		question_ob.save((err,res)=>{
+			if(err)
+				console.log('add unsuccessful')	
+			console.log('add successfull')
+		})
+		return question_ob._id
+	}else if(q.type==="True False"){
+
+		var question_ob = new QValidate(question)
+		question_ob.save((err,res)=>{
+			if(err)
+				console.log('add unsuccessful')	
+			console.log('add successfull')
+		})
+		return question_ob._id
+	}else if(q.type==="Text"){
+		var question_ob = new QValidate(question)
+		question_ob.save((err,res)=>{
+			if(err)
+				console.log('add unsuccessful')	
+			console.log('add successfull')
+		})
+		return question_ob._id
+	}else if(q.type==="Code"){
+		q.option=[]
+		var question_ob = new QCode(question)
+		question_ob.save((err,res)=>{
+			if(err)
+				console.log('add unsuccessful')	
+			console.log('add successfull')
+		})
+		return question_ob._id
+	}
 }
 
 function  updateUserById(_id,_qid){
@@ -84,12 +142,15 @@ function  updateUserById(_id,_qid){
 }
 
 
-
 //// Test databasses
 
 function getTestByUserId(_ids){
 	let query = {_id:{$in:_ids}};
 	return Test.find(query);
+}
+
+function getQuestion(_id){
+	return Test.findOne({_id:_id},{questions:1,name:1});
 }
 
 function createTest(test,owner){
@@ -103,7 +164,9 @@ function createTest(test,owner){
 	test.save((err,res)=>{
 		if(err) throw err;
 		User.updateOne({_id: owner},{$push:{tests:test._id}},(err,res)=>{
-			console.log("add test susscess");
+			if(err) console.log(err);
+			console.log(res);
+
 		});
 	})
 
@@ -113,7 +176,30 @@ function createTest(test,owner){
 
 
 function addQuestion(ids,id){
-	Test.updateOne({_id:id},{$push:{questions:ids}});
+	Test.update({_id:id},{$push:{questions:ids}},(err,res)=>{
+		if(err) console.log(err);
+		console.log(res);
+	});
+}
+
+function getTestById(_id){
+	return Test.findOne({_id:_id});
+}
+//link query fucntion 
+function getLinkByUser(_id){
+	return Link.find({"owner":_id});
+}
+
+function insertLink(l,_id){
+	let link = new Link(l)
+	link.save((err,res)=>{
+		if(err) throw err
+		console.log('create success');
+	})
+}
+
+function getLinkById(_id){
+	return Link.findOne({_id:_id});
 }
 //////Export model and function 
 
@@ -133,12 +219,22 @@ exports.UserDB={
 
 exports.QuestionDB={
 	getQuestionByUserId:getQuestionByUserId,
-	InsertQuestion:InsertQuestion
+	InsertQuestion:InsertQuestion,
+	importUpdate:importUpdate,
+	getQuestionByIds:getQuestionByIds
 }
 
 
 exports.TestDB= {
 	getTestByUserId: getTestByUserId,
 	createTest:createTest,
-	addQuestion:addQuestion
+	addQuestion:addQuestion,
+	getTestById:getTestById,
+	getQuestion:getQuestion
+}
+
+exports.LinkDB={
+	getLinkByUser:getLinkByUser,
+	insertLink:insertLink,
+	getLinkById:getLinkById
 }

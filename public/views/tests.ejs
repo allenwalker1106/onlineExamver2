@@ -48,37 +48,37 @@
             </a>
           </li>
           <li class="active">
-            <a href="./tests">
+            <a href="/tests">
               <i class="fa fa-copy"></i>
               <p>Tests</p>
             </a>
           </li>
           <li>
-            <a href="./links">
+            <a href="/links">
               <i class="fa fa-link"></i>
               <p>Links</p>
             </a>
           </li>
           <li>
-            <a href="./groups">
+            <a href="/groups">
                 <i class="fa fa-users"></i>
                 <p>Groups</p>
             </a>
           </li>
           <li>
-            <a href="./results">
+            <a href="/results">
               <i class="fa fa-file"></i>
               <p>Results</p>
             </a>
           </li>
           <li>
-              <a href="./files">
+              <a href="/files">
                 <i class="fa fa-image"></i>
                 <p>Uploads files</p>
               </a>
             </li>
           <li>
-            <a href="./user">
+            <a href="/user">
                 <i class="fa fa-user"></i>
                 <p>User Profile</p>
             </a>
@@ -148,12 +148,14 @@
                       <div class="row">
                         <div class="card" style="width: 100%; padding: 20px; border: 1px; border-style: solid;">
                               <div class="card-body">
-                                <h5 class="card-title">Tests <%=i+1%></h5>
+                                <h5 class="card-title"><a href="/test_details?_id=<%-tests[i]._id%>">Tests <%=i+1%></a></h5>
                                 <h7 class="card-subtitle mb-1 text-muted"><%=tests[i].name %></h7>
-                                <a class="card-link" data-toggle="collapse" href="#e<%=i+1%>"role="button" aria-expanded="false" ><i class="fa fa-angle-double-down"></i>Expand</a>
-                                <a href="#" class="card-link"><i class="fa fa-pencil"></i>Edit</a>
-                                <a href="#" class="card-link"><i class="fa fa-trashx"></i>Delete</a>
-                                <a href="#" class="card-link"><i class="fa fa-copy"></i>Duplicate</a>
+                              </div>
+                              <div class="card-body">
+                                  <a class="card-link" data-toggle="collapse" href="#e<%=i+1%>"role="button" aria-expanded="false" ><i class="fa fa-angle-double-down"></i>Expand</a>
+                                  <a href="/test_details?_id=<%-tests[i]._id%>" class="card-link"><i class="fa fa-pencil"></i>Edit</a>
+                                  <a href="#" class="card-link"><i class="fa fa-copy"></i>Duplicate</a>
+                                  <a href="#" class="card-link"><i class="fa fa-trash"></i>Delete</a>
                               </div>
                               <div class="card card-body collapse" id="e<%=i+1%>" >
                                 <div class="container">
@@ -177,7 +179,7 @@
                                       <a href="#" class="card-link"><i class="fa fa-user-plus"></i> Assign</a>
                                     </div>
                                     <div class="col">
-                                      <a href="#" class="card-link"><i class="fa fa-link"></i> Create Link</a>
+                                      <a href="/link_config?_id=<%-tests[i]._id%>" class="card-link"><i class="fa fa-link"></i> Create Link</a>
                                     </div>
                                   </div>
                                 </div>
